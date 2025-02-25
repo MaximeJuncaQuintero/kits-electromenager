@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Configurateur{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Configurateur de Kit</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Dimensions disponibles</h5>
+                <form id="dimensionsForm" class="mt-3">
+                    <div class="mb-3">
+                        <label for="largeur" class="form-label">Largeur (cm)</label>
+                        <input type="number" class="form-control" id="largeur" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hauteur" class="form-label">Hauteur (cm)</label>
+                        <input type="number" class="form-control" id="hauteur" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profondeur" class="form-label">Profondeur (cm)</label>
+                        <input type="number" class="form-control" id="profondeur" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Produits compatibles</h5>
+                <div id="produitsCompatibles" class="mt-3">
+                    <p class="text-muted">Veuillez saisir les dimensions pour voir les produits compatibles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('dimensionsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const dimensions = {
+        largeur: parseFloat(document.getElementById('largeur').value),
+        hauteur: parseFloat(document.getElementById('hauteur').value),
+        profondeur: parseFloat(document.getElementById('profondeur').value)
+    };
+
+    try {
+        const response = await fetch('/api/produits/dimensions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dimensions)
+        });
+        
+        const produits = await response.json();
+        const produitsDiv = document.getElementById('produitsCompatibles');
+        
+        if (produits.length === 0) {
+            produitsDiv.innerHTML = '<p class="text-warning">Aucun produit compatible trouvé.</p>';
+            return;
+        }
+
+        produitsDiv.innerHTML = '<ul class="list-group">' + 
+            produits.map(p => `
+                <li class="list-group-item">
+                    <h6>${p.nom}</h6>
+                    <small class="text-muted">Dimensions: ${p.dimensions}</small>
+                </li>
+            `).join('') + 
+            '</ul>';
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+});
+</script>
+{% endblock %}
