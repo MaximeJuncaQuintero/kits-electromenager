@@ -25,11 +25,15 @@ def configurer_kit():
     produits_demandes = data.get('produits', {})
     
     suggestions = {}
+    total_cost = 0  # Pour tracker le coût total
     
     for categorie, dimensions in produits_demandes.items():
         largeur = float(dimensions.get('largeur', 0))
         hauteur = float(dimensions.get('hauteur', 0))
         profondeur = float(dimensions.get('profondeur', 0))
+        
+        # Budget restant pour ce produit
+        budget_restant = budget - total_cost
         
         produits_compatibles = Produit.query.filter(
             and_(
@@ -37,40 +41,23 @@ def configurer_kit():
                 Produit.largeur <= largeur,
                 Produit.hauteur <= hauteur,
                 Produit.profondeur <= profondeur,
-                Produit.prix <= budget
+                Produit.prix <= budget_restant  # Utiliser le budget restant
             )
-        ).order_by(
-            (largeur - Produit.largeur) + 
-            (hauteur - Produit.hauteur) + 
-            (profondeur - Produit.profondeur)
-        ).all()
+        ).order_by(Produit.prix.desc()).all()  # Prendre le meilleur produit dans le budget
         
-        suggestions[categorie] = [{
-            'id': p.id,
-            'nom': p.nom,
-            'prix': float(p.prix),
-            'largeur': float(p.largeur),
-            'hauteur': float(p.hauteur),
-            'profondeur': float(p.profondeur)
-        } for p in produits_compatibles]
-    
-    meilleures_suggestions = {}
-    total = 0
-    
-    for categorie, produits in suggestions.items():
-        if produits:
-            meilleur_produit = produits[0]
-            total += meilleur_produit['prix']
-            
-            if total <= budget:
-                meilleures_suggestions[categorie] = [meilleur_produit]
-            else:
-                alternatives = [p for p in produits if p['prix'] <= (budget - (total - meilleur_produit['prix']))]
-                if alternatives:
-                    meilleures_suggestions[categorie] = [alternatives[0]]
-                    total = total - meilleur_produit['prix'] + alternatives[0]['prix']
+        if produits_compatibles:
+            produit = produits_compatibles[0]
+            total_cost += float(produit.prix)
+            suggestions[categorie] = [{
+                'id': produit.id,
+                'nom': produit.nom,
+                'prix': float(produit.prix),
+                'largeur': float(produit.largeur),
+                'hauteur': float(produit.hauteur),
+                'profondeur': float(produit.profondeur)
+            }]
     
     return jsonify({
-        'suggestions': meilleures_suggestions,
-        'total': total
+        'suggestions': suggestions,
+        'total': total_cost
     })
