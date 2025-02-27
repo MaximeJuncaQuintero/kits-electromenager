@@ -2,6 +2,7 @@ from app import app, db
 from flask_migrate import upgrade
 from scripts.seed_db import seed_database
 import os
+from sqlalchemy import text
 
 def initialize_database():
     try:
@@ -9,7 +10,9 @@ def initialize_database():
         if os.getenv('DATABASE_URL'):
             with app.app_context():
                 # Drop alembic_version table to clean migration history
-                db.engine.execute('DROP TABLE IF EXISTS alembic_version')
+                with db.engine.connect() as connection:
+                    connection.execute(text('DROP TABLE IF EXISTS alembic_version'))
+                    connection.commit()
                 
                 # Create all tables directly
                 db.create_all()
