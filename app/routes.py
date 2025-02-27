@@ -103,15 +103,15 @@ def dashboard():
                 return "Kit non trouvé", 404
         
         return render_template('dashboard.html',
-                            all_kits=all_kits,
-                            total_value=float(total_value),
-                            total_savings=float(total_savings),
-                            total_products=total_products,
-                            appartements=appartements,
-                            selected_appartement=appartement_filter,
-                            kit=selected_kit,
-                            Decimal=Decimal)
-            
+                             all_kits=all_kits,
+                             total_value=float(total_value),
+                             total_savings=float(total_savings),
+                             total_products=total_products,
+                             appartements=appartements,
+                             selected_appartement=appartement_filter,
+                             kit=selected_kit,
+                             Decimal=Decimal)
+                             
     except Exception as e:
         app.logger.error(f"Erreur dans le dashboard: {str(e)}")
         return "Une erreur est survenue lors du chargement du dashboard", 500
