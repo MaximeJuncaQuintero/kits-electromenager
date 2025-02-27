@@ -2,10 +2,12 @@ from flask import render_template, request, jsonify, redirect, url_for, session
 from app import app, db
 from app.models import Produit, Kit, Intervention
 from sqlalchemy import and_
+from decimal import Decimal
 
 @app.route('/')
 def index():
-    return render_template('kits/configurateur.html')
+    """Page d'accueil"""
+    return render_template('index.html')
 
 @app.route('/kits')
 def liste_kits():
@@ -221,3 +223,50 @@ def get_kit(kit_id):
             'profondeur': float(p.profondeur)
         } for p in kit.produits]
     })
+
+@app.route('/api/kit/sauvegarder', methods=['POST'])
+def sauvegarder_kit():
+    """Sauvegarder un kit configuré"""
+    try:
+        data = request.json
+        suggestions = session.get('kit_suggestions', {})
+        
+        if not suggestions:
+            return jsonify({
+                'status': 'error',
+                'message': 'Aucun kit à sauvegarder'
+            }), 400
+        
+        # Créer un nouveau kit
+        nouveau_kit = Kit(
+            nom=data.get('nom', 'Nouveau Kit'),
+            type_logement=data.get('type_logement', 'Studio'),
+            prix_total=Decimal(str(session.get('kit_total', 0)))
+        )
+        
+        # Ajouter les produits au kit
+        for categorie, produits in suggestions.items():
+            for p in produits:
+                produit = Produit.query.get(p['id'])
+                if produit:
+                    nouveau_kit.produits.append(produit)
+        
+        db.session.add(nouveau_kit)
+        db.session.commit()
+        
+        # Vider la session
+        session.pop('kit_suggestions', None)
+        session.pop('kit_total', None)
+        
+        return jsonify({
+            'status': 'success',
+            'kit_id': nouveau_kit.id,
+            'message': 'Kit sauvegardé avec succès'
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Erreur lors de la sauvegarde du kit: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500

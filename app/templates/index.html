@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Gestion des Kits{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="mb-4">Bienvenue dans la Gestion des Kits</h1>
+    
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Configurer un Kit</h5>
+                    <p class="card-text">Créez un nouveau kit personnalisé selon vos besoins</p>
+                    <a href="{{ url_for('configurateur') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Nouveau Kit
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Tableau de Bord</h5>
+                    <p class="card-text">Gérez et suivez vos kits existants</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-success btn-lg">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    border-radius: 8px;
+}
+</style>
+{% endblock %} 
