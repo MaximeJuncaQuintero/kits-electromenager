@@ -3,14 +3,14 @@
 {% block title %}Kits Électroménager - Configurateur{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container py-4">
     <!-- Introduction -->
-    <div class="row mb-4">
+    <div class="row mb-3">
         <div class="col-12">
             <div class="card bg-light">
-                <div class="card-body">
-                    <h1 class="card-title h3">Configurateur de Kits Électroménager</h1>
-                    <p class="card-text">
+                <div class="card-body py-2">
+                    <h2 class="card-title h5 mb-2">Configurateur de Kits Électroménager</h2>
+                    <p class="card-text mb-0 small">
                         Trouvez les équipements parfaitement adaptés à votre espace.
                         Indiquez simplement vos dimensions disponibles et votre budget,
                         nous vous proposerons le kit idéal.
@@ -89,41 +89,59 @@
     </div>
 </div>
 
-<div class="fixed-bottom bg-light p-3 border-top" id="saveBar" style="display: none;">
+<div class="fixed-bottom bg-light border-top" id="saveBar" style="display: none;">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-4">
-                <input type="text" class="form-control" id="kitName" placeholder="Nom du kit">
+        <div class="row align-items-center py-2">
+            <div class="col-md-6">
+                <input type="text" class="form-control form-control-sm" id="kitName" placeholder="Nom du kit">
             </div>
-            <div class="col-md-4">
-                <select class="form-control" id="kitType">
-                    <option value="Studio">Studio</option>
-                    <option value="T1">T1</option>
-                    <option value="T2">T2</option>
-                    <option value="T3">T3</option>
-                    <option value="T4">T4</option>
-                </select>
+            <div class="col-md-6">
+                <input type="text" class="form-control form-control-sm" id="appartement" placeholder="Nom de l'appartement">
             </div>
-            <div class="col-md-4 text-end">
-                <button class="btn btn-success" onclick="sauvegarderKit()">
+            <div class="col-md-12 text-end mt-2">
+                <button class="btn btn-primary btn-sm" onclick="sauvegarderKit()">
                     <i class="fas fa-save"></i> Sauvegarder le Kit
                 </button>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="mb-4">
-    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-        <i class="fas fa-home"></i> Accueil
-    </a>
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
-        <i class="fas fa-chart-line"></i> Dashboard
-    </a>
-</div>
+<style>
+header {
+    background: white;
+}
+
+.btn-link {
+    border: 1px solid #dee2e6;
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+}
+
+.btn-link:hover {
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
+#saveBar {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(5px);
+    z-index: 1020;
+}
+
+.card {
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -221,9 +239,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function displayKitResult(result) {
+        // Store the result globally for the save function
+        window.lastKitResult = result;
+        
         const kitResult = document.getElementById('kitResult');
         if (!result.suggestions || Object.keys(result.suggestions).length === 0) {
             kitResult.innerHTML = '<div class="alert alert-warning">Aucune combinaison trouvée pour ces critères.</div>';
+            updateUI({});
             return;
         }
 
@@ -294,44 +316,64 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         kitResult.innerHTML = html;
-
+        
         updateUI(result.suggestions);
     }
 
     function updateUI(suggestions) {
-        // Afficher la barre de sauvegarde si des produits sont sélectionnés
-        document.getElementById('saveBar').style.display = 
-            Object.keys(suggestions).length > 0 ? 'block' : 'none';
+        const saveBar = document.getElementById('saveBar');
+        const mainContainer = document.querySelector('.container');
+        
+        if (Object.keys(suggestions).length > 0) {
+            saveBar.style.display = 'block';
+            mainContainer.style.paddingBottom = '70px';
+        } else {
+            saveBar.style.display = 'none';
+            mainContainer.style.paddingBottom = '20px';
+        }
     }
 
-    function sauvegarderKit() {
+    window.sauvegarderKit = function() {
+        if (!window.lastKitResult || !window.lastKitResult.suggestions) {
+            alert('Veuillez d\'abord configurer un kit avant de le sauvegarder');
+            return;
+        }
+
         const nom = document.getElementById('kitName').value || 'Nouveau Kit';
-        const type_logement = document.getElementById('kitType').value;
+        const appartement = document.getElementById('appartement').value;
+        
+        const requestData = {
+            nom: nom,
+            appartement: appartement,
+            suggestions: window.lastKitResult.suggestions,
+            total: window.lastKitResult.total
+        };
         
         fetch('/api/kit/sauvegarder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                nom: nom,
-                type_logement: type_logement
-            })
+            body: JSON.stringify(requestData)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur réseau');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.status === 'success') {
-                // Rediriger vers le dashboard avec le nouveau kit
-                window.location.href = '/dashboard?kit_id=' + data.kit_id;
+                window.location.href = data.redirect_url;
             } else {
-                alert('Erreur: ' + data.message);
+                throw new Error(data.message || 'Erreur lors de la sauvegarde');
             }
         })
         .catch(error => {
             console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de la sauvegarde');
+            alert('Une erreur est survenue lors de la sauvegarde: ' + error.message);
         });
-    }
+    };
 });
 </script>
 {% endblock %}

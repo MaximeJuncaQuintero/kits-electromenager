@@ -17,10 +17,11 @@ class Kit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100), nullable=False)
     type_logement = db.Column(db.String(50))
+    appartement = db.Column(db.String(100))
     prix_total = db.Column(db.DECIMAL(10,2), nullable=False)
     
     # Relations
-    produits = db.relationship('Produit', secondary='kit_produits')
+    produits = db.relationship('Produit', secondary='kit_produits', lazy='joined')
 
 # Table d'association pour Kit-Produit
 kit_produits = db.Table('kit_produits',

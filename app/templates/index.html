@@ -1,18 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Accueil - Gestion des Kits{% endblock %}
+{% block title %}Kits Électroménager - Accueil{% endblock %}
 
 {% block content %}
-<div class="container text-center mt-5">
-    <h1 class="mb-4">Bienvenue dans la Gestion des Kits</h1>
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h1 class="h3">L'Électroménager Sans Contrainte</h1>
+        <p class="lead text-muted">Kits électroménager sur mesure avec reprise garantie</p>
+    </div>
     
     <div class="row justify-content-center mt-5">
         <div class="col-md-4 mb-3">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Configurer un Kit</h5>
-                    <p class="card-text">Créez un nouveau kit personnalisé selon vos besoins</p>
-                    <a href="{{ url_for('configurateur') }}" class="btn btn-primary btn-lg">
+                    <p class="card-text flex-grow-1">Créez un nouveau kit personnalisé selon vos besoins</p>
+                    <a href="{{ url_for('configurateur') }}" class="btn btn-primary btn-lg mt-auto">
                         <i class="fas fa-plus"></i> Nouveau Kit
                     </a>
                 </div>
@@ -21,10 +24,10 @@
         
         <div class="col-md-4 mb-3">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Tableau de Bord</h5>
-                    <p class="card-text">Gérez et suivez vos kits existants</p>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-success btn-lg">
+                    <p class="card-text flex-grow-1">Gérez et suivez vos kits existants</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg mt-auto">
                         <i class="fas fa-chart-line"></i> Dashboard
                     </a>
                 </div>
@@ -38,6 +41,7 @@
     transition: transform 0.2s;
     border: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%;
 }
 
 .card:hover {
@@ -47,6 +51,11 @@
 .btn-lg {
     padding: 1rem 2rem;
     border-radius: 8px;
+    width: 100%;
+}
+
+.card-body {
+    height: 100%;
 }
 </style>
 {% endblock %} 

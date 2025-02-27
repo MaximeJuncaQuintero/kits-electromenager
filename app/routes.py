@@ -69,67 +69,52 @@ def configurer_kit():
 
 @app.route('/dashboard')
 def dashboard():
-    """Affiche le tableau de bord du client"""
     try:
-        # Récupérer le kit_id depuis l'URL ou prendre le premier kit
+        # Récupérer le filtre d'appartement et l'ID du kit
+        appartement_filter = request.args.get('appartement', 'all')
         kit_id = request.args.get('kit_id', type=int)
         
         # Récupérer tous les kits
-        all_kits = Kit.query.all()
+        query = Kit.query
+        if appartement_filter != 'all':
+            query = query.filter(Kit.appartement == appartement_filter)
+        all_kits = query.all()
         
-        if not all_kits:
-            return redirect(url_for('configurateur'))
-        
-        # Organiser les kits par type de logement
-        kits_by_type = {}
-        types_logement = set()
-        total_value = 0.0
+        # Initialiser les statistiques
+        total_value = Decimal('0')
+        total_savings = Decimal('0')
         total_products = 0
         
-        for k in all_kits:
-            type_logement = k.type_logement or "Autre"
-            if type_logement not in kits_by_type:
-                kits_by_type[type_logement] = []
-            kits_by_type[type_logement].append(k)
-            types_logement.add(type_logement)
-            
-            # S'assurer que prix_total est un float et gérer le cas None
-            try:
-                if k.prix_total is not None:
-                    prix = float(str(k.prix_total))
-                else:
-                    prix = 0.0
-            except (ValueError, TypeError):
-                prix = 0.0
-                
-            total_value += prix
-            total_products += len(k.produits)
+        # Calculer les statistiques sur les kits filtrés
+        for kit in all_kits:
+            kit_price = Decimal(str(kit.prix_total)) if not isinstance(kit.prix_total, Decimal) else kit.prix_total
+            total_value += kit_price
+            total_savings += kit_price * Decimal('0.15')  # 15% d'économies
+            total_products += len(kit.produits)
+
+        # Récupérer les appartements uniques pour le filtre (à partir de tous les kits)
+        appartements = sorted(list(set(kit.appartement for kit in Kit.query.all() if kit.appartement)))
         
-        # Calculer les économies totales (15% du total)
-        total_savings = total_value * 0.15
-        
-        # Si kit_id est spécifié, prendre ce kit, sinon prendre le premier
-        kit = Kit.query.get(kit_id) if kit_id else all_kits[0]
-        
-        # S'assurer que le prix total du kit sélectionné est aussi un float
-        if kit and kit.prix_total:
-            try:
-                kit.prix_total = float(str(kit.prix_total))
-            except (ValueError, TypeError):
-                kit.prix_total = 0.0
+        # Récupérer le kit sélectionné
+        selected_kit = None
+        if kit_id:
+            selected_kit = Kit.query.get(kit_id)
+            if not selected_kit:
+                return "Kit non trouvé", 404
         
         return render_template('dashboard.html',
-                            kit=kit,
                             all_kits=all_kits,
-                            types_logement=sorted(types_logement),
-                            kits_by_type=kits_by_type,
-                            total_value=total_value,
-                            total_savings=total_savings,
-                            total_products=total_products)
-
+                            total_value=float(total_value),
+                            total_savings=float(total_savings),
+                            total_products=total_products,
+                            appartements=appartements,
+                            selected_appartement=appartement_filter,
+                            kit=selected_kit,
+                            Decimal=Decimal)
+            
     except Exception as e:
         app.logger.error(f"Erreur dans le dashboard: {str(e)}")
-        return "Une erreur s'est produite", 500
+        return "Une erreur est survenue lors du chargement du dashboard", 500
 
 @app.route('/api/kits/<int:kit_id>', methods=['PUT'])
 def update_kit(kit_id):
@@ -165,6 +150,18 @@ def update_kit(kit_id):
         
     except Exception as e:
         app.logger.error(f"Erreur lors de la mise à jour du kit: {str(e)}")
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+@app.route('/api/kits/<int:kit_id>', methods=['DELETE'])
+def supprimer_kit(kit_id):
+    """Supprimer un kit"""
+    try:
+        kit = Kit.query.get_or_404(kit_id)
+        db.session.delete(kit)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Kit supprimé avec succès'})
+    except Exception as e:
+        db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
 def calculate_savings(suggestions):
@@ -240,7 +237,7 @@ def sauvegarder_kit():
         # Créer un nouveau kit
         nouveau_kit = Kit(
             nom=data.get('nom', 'Nouveau Kit'),
-            type_logement=data.get('type_logement', 'Studio'),
+            appartement=data.get('appartement'),
             prix_total=Decimal(str(session.get('kit_total', 0)))
         )
         
@@ -258,9 +255,15 @@ def sauvegarder_kit():
         session.pop('kit_suggestions', None)
         session.pop('kit_total', None)
         
+        # Construire l'URL de redirection avec l'appartement
+        redirect_url = url_for('dashboard', kit_id=nouveau_kit.id)
+        if nouveau_kit.appartement:
+            redirect_url = url_for('dashboard', kit_id=nouveau_kit.id, appartement=nouveau_kit.appartement)
+        
         return jsonify({
             'status': 'success',
             'kit_id': nouveau_kit.id,
+            'redirect_url': redirect_url,
             'message': 'Kit sauvegardé avec succès'
         })
         
