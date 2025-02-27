@@ -1,5 +1,6 @@
 Flask==2.0.1
 Flask-SQLAlchemy==2.5.1
+Flask-Migrate==4.0.5
 SQLAlchemy==1.4.23
 psycopg2-binary==2.9.9  # Version mise à jour
 python-dotenv==0.19.0
