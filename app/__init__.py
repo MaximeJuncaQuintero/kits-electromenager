@@ -1,8 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import os
+import logging
 
 app = Flask(__name__)
+
+# Configuration des logs
+logging.basicConfig(level=logging.DEBUG)
 
 # Configuration de la base de données
 database_url = os.getenv('DATABASE_URL')
@@ -18,6 +23,10 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_key')
 
+# Debug mode
+app.debug = True
+
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 from app import routes, models
