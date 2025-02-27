@@ -3,33 +3,143 @@
 {% block title %}Kits Électroménager - Accueil{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="text-center mb-4">
-        <h1 class="h3">L'Électroménager Sans Contrainte</h1>
-        <p class="lead text-muted">Kits électroménager sur mesure avec reprise garantie</p>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold mb-2">L'Électroménager Sans Contrainte</h1>
+        <p class="lead text-secondary mb-0">Kits électroménager sur mesure avec reprise garantie</p>
     </div>
     
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Configurer un Kit</h5>
-                    <p class="card-text flex-grow-1">Créez un nouveau kit personnalisé selon vos besoins</p>
-                    <a href="{{ url_for('configurateur') }}" class="btn btn-primary btn-lg mt-auto">
-                        <i class="fas fa-plus"></i> Nouveau Kit
+    <div class="row justify-content-center g-4 mt-4">
+        <div class="col-md-4">
+            <div class="card h-100 feature-card">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="icon-wrapper mb-4">
+                        <div class="icon-stack">
+                            <i class="fas fa-plug text-primary"></i>
+                            <i class="fas fa-home text-primary icon-overlay"></i>
+                        </div>
+                    </div>
+                    <h5 class="card-title h4 mb-3">Configurer un Kit</h5>
+                    <p class="card-text text-secondary flex-grow-1 mb-4">Créez un nouveau kit personnalisé selon vos besoins et votre budget.</p>
+                    <a href="{{ url_for('configurateur') }}" class="btn btn-primary btn-lg mt-auto stretched-link">
+                        <i class="fas fa-plus me-2"></i>Nouveau Kit
                     </a>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Tableau de Bord</h5>
-                    <p class="card-text flex-grow-1">Gérez et suivez vos kits existants</p>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg mt-auto">
-                        <i class="fas fa-chart-line"></i> Dashboard
+        <div class="col-md-4">
+            <div class="card h-100 feature-card">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-chart-line text-primary fa-2x"></i>
+                    </div>
+                    <h5 class="card-title h4 mb-3">Tableau de Bord</h5>
+                    <p class="card-text text-secondary flex-grow-1 mb-4">Gérez et suivez vos kits existants en temps réel.</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg mt-auto stretched-link">
+                        <i class="fas fa-chart-line me-2"></i>Dashboard
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-5 pt-5">
+        <div class="col-lg-10">
+            <div class="card bg-light border-0">
+                <div class="card-body p-4">
+                    <h3 class="h4 mb-4">Une Solution Complète pour Votre Électroménager</h3>
+                    <div class="row g-4">
+                        <!-- Propriétaires & Agences -->
+                        <div class="col-lg-6">
+                            <div class="card border-0 h-100 bg-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fas fa-building text-primary fa-2x me-3"></i>
+                                        <h4 class="h5 mb-0">Propriétaires & Agences</h4>
+                                    </div>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="d-flex align-items-start mb-3">
+                                            <i class="fas fa-check text-success me-3 mt-1"></i>
+                                            <p class="mb-0">Économies jusqu'à 30% vs achats séparés</p>
+                                        </li>
+                                        <li class="d-flex align-items-start mb-3">
+                                            <i class="fas fa-check text-success me-3 mt-1"></i>
+                                            <p class="mb-0">Gestion simplifiée du parc d'équipements</p>
+                                        </li>
+                                        <li class="d-flex align-items-start">
+                                            <i class="fas fa-check text-success me-3 mt-1"></i>
+                                            <p class="mb-0">Optimisation fiscale avec charges déductibles</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Locataires -->
+                        <div class="col-lg-6">
+                            <div class="card border-0 h-100 bg-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fas fa-home text-primary fa-2x me-3"></i>
+                                        <h4 class="h5 mb-0">Locataires</h4>
+                                    </div>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="d-flex align-items-start mb-3">
+                                            <i class="fas fa-check text-success me-3 mt-1"></i>
+                                            <p class="mb-0">Équipements sur mesure pour espaces contraints</p>
+                                        </li>
+                                        <li class="d-flex align-items-start mb-3">
+                                            <i class="fas fa-check text-success me-3 mt-1"></i>
+                                            <p class="mb-0">Économies garanties vs achats multiples</p>
+                                        </li>
+                                        <li class="d-flex align-items-start">
+                                            <i class="fas fa-check text-success me-3 mt-1"></i>
+                                            <p class="mb-0">Reprise assurée en fin de bail</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Services Inclus -->
+                        <div class="col-12">
+                            <div class="card border-0 bg-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fas fa-star text-primary fa-2x me-3"></i>
+                                        <h4 class="h5 mb-0">Services Premium Inclus</h4>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-truck text-success me-3"></i>
+                                                <p class="mb-0">Livraison et installation sur RDV</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-tools text-success me-3"></i>
+                                                <p class="mb-0">Maintenance et SAV réactif</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-sync text-success me-3"></i>
+                                                <p class="mb-0">Système de reprise garanti</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-leaf text-success me-3"></i>
+                                                <p class="mb-0">Démarche éco-responsable</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -37,25 +147,135 @@
 </div>
 
 <style>
-.card {
-    transition: transform 0.2s;
+.feature-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 100%;
 }
 
-.card:hover {
+.feature-card:hover {
     transform: translateY(-5px);
+}
+
+.icon-wrapper {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background-color: rgba(37, 99, 235, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.feature-card:hover .icon-wrapper {
+    transform: scale(1.1);
+}
+
+.icon-stack {
+    position: relative;
+    display: inline-block;
+}
+
+.icon-stack i {
+    font-size: 1.75rem;
+    transition: transform 0.2s ease;
+}
+
+.icon-stack .icon-overlay {
+    position: absolute;
+    font-size: 1rem;
+    right: -0.5rem;
+    bottom: -0.5rem;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
 }
 
 .btn-lg {
     padding: 1rem 2rem;
-    border-radius: 8px;
+    font-size: 1rem;
     width: 100%;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
 }
 
-.card-body {
-    height: 100%;
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.display-5 {
+    font-size: 2.5rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(120deg, var(--primary-color), #1d4ed8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.lead {
+    font-size: 1.125rem;
+    font-weight: 400;
+}
+
+.card {
+    border: none;
+    background: white;
+}
+
+.card.bg-light {
+    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9) !important;
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+@media (min-width: 768px) {
+    .feature-card {
+        min-height: 360px;
+    }
+}
+
+/* Subtle gradient background */
+body {
+    background: linear-gradient(150deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+}
+
+/* Improve spacing for features section */
+.row.g-4 {
+    --bs-gutter-y: 2rem;
+}
+
+/* Add subtle animation to success icons */
+.fa-check-circle,
+.fa-shield-alt,
+.fa-sync,
+.fa-headset {
+    transition: transform 0.2s ease;
+}
+
+.card:hover .fa-check-circle,
+.card:hover .fa-shield-alt,
+.card:hover .fa-sync,
+.card:hover .fa-headset {
+    transform: scale(1.1);
+}
+
+/* Improve text contrast */
+.text-secondary {
+    color: #475569 !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Add subtle border to separate sections */
+.mt-5.pt-5 {
+    border-top: 1px solid rgba(37, 99, 235, 0.1);
+    margin-top: 4rem;
+    padding-top: 4rem;
 }
 </style>
 {% endblock %} 
