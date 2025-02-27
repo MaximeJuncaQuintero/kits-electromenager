@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, redirect, url_for, session
 from app import app, db
 from app.models import Produit, Kit, Intervention
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from decimal import Decimal
 
 @app.route('/')
@@ -92,8 +92,8 @@ def dashboard():
             total_savings += kit_price * Decimal('0.15')  # 15% d'économies
             total_products += len(kit.produits)
 
-        # Récupérer les appartements uniques pour le filtre (à partir de tous les kits)
-        appartements = sorted(list(set(kit.appartement for kit in Kit.query.all() if kit.appartement)))
+        # Récupérer les appartements uniques en utilisant une requête distincte
+        appartements = [appart[0] for appart in db.session.query(Kit.appartement).distinct().filter(Kit.appartement != None).order_by(Kit.appartement).all()]
         
         # Récupérer le kit sélectionné
         selected_kit = None
