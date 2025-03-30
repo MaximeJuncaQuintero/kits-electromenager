@@ -67,18 +67,22 @@ def configurer_kit():
         'total': total_cost
     })
 
+@app.route('/dashboard/')
 @app.route('/dashboard')
 def dashboard():
     try:
+        app.logger.debug("Starting dashboard route")
         # Récupérer le filtre d'appartement et l'ID du kit
         appartement_filter = request.args.get('appartement', 'all')
         kit_id = request.args.get('kit_id', type=int)
+        app.logger.debug(f"Filters - appartement: {appartement_filter}, kit_id: {kit_id}")
         
         # Récupérer tous les kits
         query = Kit.query
         if appartement_filter != 'all':
             query = query.filter(Kit.appartement == appartement_filter)
         all_kits = query.all()
+        app.logger.debug(f"Found {len(all_kits)} kits")
         
         # Initialiser les statistiques
         total_value = Decimal('0')
@@ -87,6 +91,7 @@ def dashboard():
         
         # Calculer les statistiques sur les kits filtrés
         for kit in all_kits:
+            app.logger.debug(f"Processing kit {kit.id}: {kit.nom}")
             kit_price = Decimal(str(kit.prix_total)) if not isinstance(kit.prix_total, Decimal) else kit.prix_total
             total_value += kit_price
             total_savings += kit_price * Decimal('0.15')  # 15% d'économies
@@ -94,14 +99,19 @@ def dashboard():
 
         # Récupérer les appartements uniques en utilisant une requête distincte
         appartements = [appart[0] for appart in db.session.query(Kit.appartement).distinct().filter(Kit.appartement != None).order_by(Kit.appartement).all()]
+        app.logger.debug(f"Found {len(appartements)} unique apartments")
         
         # Récupérer le kit sélectionné
         selected_kit = None
         if kit_id:
+            app.logger.debug(f"Looking for kit with ID {kit_id}")
             selected_kit = Kit.query.get(kit_id)
             if not selected_kit:
+                app.logger.warning(f"Kit with ID {kit_id} not found")
                 return "Kit non trouvé", 404
+            app.logger.debug(f"Found selected kit: {selected_kit.nom}")
         
+        app.logger.debug("Rendering dashboard template")
         return render_template('dashboard.html',
                              all_kits=all_kits,
                              total_value=float(total_value),
@@ -113,7 +123,7 @@ def dashboard():
                              Decimal=Decimal)
                              
     except Exception as e:
-        app.logger.error(f"Erreur dans le dashboard: {str(e)}")
+        app.logger.error(f"Erreur dans le dashboard: {str(e)}", exc_info=True)
         return "Une erreur est survenue lors du chargement du dashboard", 500
 
 @app.route('/api/kits/<int:kit_id>', methods=['PUT'])
@@ -269,6 +279,23 @@ def sauvegarder_kit():
         
     except Exception as e:
         app.logger.error(f"Erreur lors de la sauvegarde du kit: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/test-db')
+def test_db():
+    try:
+        # Test database connection
+        kits = Kit.query.all()
+        return jsonify({
+            'status': 'success',
+            'message': 'Database connection successful',
+            'kits_count': len(kits)
+        })
+    except Exception as e:
+        app.logger.error(f"Database connection error: {str(e)}", exc_info=True)
         return jsonify({
             'status': 'error',
             'message': str(e)
